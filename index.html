@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Rift - Ultra Premium Mobile Puzzle Game</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,500;0,700;0,900;1,400&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #06060c;
+            --bg-card: #111122;
+            --primary: #FF007A; /* Neon Pink/Magenta */
+            --secondary: #00F0FF; /* Neon Cyan/Lightning */
+            --accent: #FFD700; /* Explosion Gold */
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glow-pink: 0 0 20px rgba(255, 0, 122, 0.6);
+            --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.6);
+            --glow-gold: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Ambient Background Grid & Lights */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 122, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
+            background-size: cover;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.7;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Navigation Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 8%;
+            background: rgba(6, 6, 12, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary);
+            text-shadow: var(--glow-pink);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s, text-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--secondary);
+            text-shadow: var(--glow-cyan);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 120px 8% 60px 8%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 55%;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 0, 122, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 100px;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            box-shadow: inset 0 0 10px rgba(255, 0, 122, 0.2);
+            animation: pulse 2s infinite alternate;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span.gradient-text-1 {
+            background: linear-gradient(135deg, #fff 30%, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--glow-pink);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(255, 0, 122, 0.9);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--glow-cyan);
+            color: var(--secondary);
+            transform: translateY(-4px);
+        }
+
+        /* Phone mockup styling placeholder animation */
+        .hero-visual {
+            position: relative;
+            width: 35%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 280px;
+            height: 570px;
+            background: #000;
+            border: 10px solid #1e1e2f;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 40px rgba(0, 240, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1b1035, #070314);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* Mock game UI elements */
+        .mock-header {
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+        }
+        .mock-score { color: var(--accent); }
+
+        .mock-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin: auto 0;
+        }
+
+        .mock-block {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            background: #222;
+            position: relative;
+            overflow: hidden;
+        }
+        .mock-block.p { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+        .mock-block.c { background: var(--secondary); box-shadow: 0 0 8px var(--secondary); }
+        .mock-block.a { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        
+        /* Interactive features section */
+        .section-title {
+            text-align: center;
+            font-size: 42px;
+            text-transform: uppercase;
+            margin-bottom: 60px;
+            letter-spacing: 1px;
+        }
+
+        .section-title span {
+            color: var(--secondary);
+            text-shadow: var(--glow-cyan);
+        }
+
+        .features {
+            padding: 100px 8%;
+            background: rgba(255,255,255,0.01);
+            position: relative;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            transition: all 0.4s;
+        }
+
+        .card-bomb::before { background: var(--accent); }
+        .card-rocket::before { background: var(--primary); }
+        .card-lightning::before { background: var(--secondary); }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: #15152d;
+        }
+
+        .card-bomb:hover { border-color: var(--accent); box-shadow: var(--glow-gold); }
+        .card-rocket:hover { border-color: var(--primary); box-shadow: var(--glow-pink); }
+        .card-lightning:hover { border-color: var(--secondary); box-shadow: var(--glow-cyan); }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+        }
+
+        .card-bomb .feature-icon { background: rgba(255, 215, 0, 0.1); color: var(--accent); }
+        .card-rocket .feature-icon { background: rgba(255, 0, 122, 0.1); color: var(--primary); }
+        .card-lightning .feature-icon { background: rgba(0, 240, 255, 0.1); color: var(--secondary); }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 14px;
+            color: #fff;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* Interactive Gameplay showcase canvas / box */
+        .gameplay-interactive {
+            padding: 80px 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .interactive-board {
+            width: 100%;
+            max-width: 800px;
+            background: #0f0f1f;
+            border: 2px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .interactive-title {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: var(--text-main);
+        }
+
+        .action-triggers {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .trigger-btn {
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: #fff;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .trigger-btn[data-type="bomb"]:hover, .trigger-btn[data-type="bomb"].active { background: var(--accent); color: #000; box-shadow: var(--glow-gold); border-color: var(--accent); }
+        .trigger-btn[data-type="rocket"]:hover, .trigger-btn[data-type="rocket"].active { background: var(--primary); color: #fff; box-shadow: var(--glow-pink); border-color: var(--primary); }
+        .trigger-btn[data-type="lightning"]:hover, .trigger-btn[data-type="lightning"].active { background: var(--secondary); color: #000; box-shadow: var(--glow-cyan); border-color: var(--secondary); }
+
+        .preview-display-zone {
+            height: 220px;
+            background: #06060c;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        .effect-animation {
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: all 0.5s ease;
+        }
+
+        /* Level Progression / Stats Section */
+        .stats-section {
+            padding: 80px 8%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
+        }
+
+        .stat-box h2 {
+            font-size: 48px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .stat-box:nth-child(1) h2 { color: var(--primary); text-shadow: var(--glow-pink); }
+        .stat-box:nth-child(2) h2 { color: var(--secondary); text-shadow: var(--glow-cyan); }
+        .stat-box:nth-child(3) h2 { color: var(--accent); text-shadow: var(--glow-gold); }
+        .stat-box:nth-child(4) h2 { color: #a855f7; text-shadow: 0 0 20px rgba(168,85,247,0.6); }
+
+        .stat-box p {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        footer {
+            background: #030307;
+            padding: 60px 8% 30px 8%;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .copyright {
+            text-align: center;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 160px; gap: 60px; }
+            .hero-content { max-width: 100%; }
+            .cta-group { justify-content: center; }
+            .hero-visual { width: 100%; }
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-section { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Navigation -->
+    <header>
+        <div class="logo">COLOR<span>RIFT</span></div>
+        <nav>
+            <ul>
+                <li><a href="#hero" class="active">Ana Sayfa</a></li>
+                <li><a href="#features">Mekanikler</a></li>
+                <li><a href="#interactive">Ön İzleme</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">YENİ NESİL PUZZLE DENEYİMİ</div>
+            <h1><span class="gradient-text-1">Kaosu Kontrol Et,<br>Rift'i Kapat.</span></h1>
+            <p>Color Rift ile canlı renklerin, büyüleyici efektlerin ve zincirleme reaksiyonların dünyasına adım at. Doğru hamleyi yap, taktiksel güçlendiricileri birleştir ve en yüksek skora ulaş!</p>
+            <div class="cta-group">
+                <a href="#" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 10c-.17 0-.34-.01-.51-.04C16.22 6.61 13.04 4 9.5 4 5.36 4 2 7.36 2 11.5S5.36 19 9.5 19c.7 0 1.39-.1 2.05-.29.41-.12.84.11.96.52.12.41-.11.84-.52.96-.83.24-1.69.37-2.49.37C4.26 20.56 0 16.3 0 11.5S4.26 2.44 9.5 2.44c4.32 0 8.1 2.97 9.21 7.15.11.42-.14.85-.56.96-.22.05-.44.05-.65.01V10z"/></svg>
+                    Google Play'den İndir
+                </a>
+                <a href="#features" class="btn btn-secondary">Özellikleri İncele</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="phone-container">
+                <div class="phone-screen">
+                    <div class="mock-header">
+                        <span>LEVEL 45</span>
+                        <span class="mock-score">★ 24,850</span>
+                    </div>
+                    <div class="mock-grid">
+                        <!-- Simulated active glowing matrix game screen -->
+                        <div class="mock-block p"></div><div class="mock-block"></div><div class="mock-block c"></div><div class="mock-block"></div><div class="mock-block a"></div>
+                        <div class="mock-block"></div><div class="mock-block p"></div><div class="mock-block"></div><div class="mock-block c"></div><div class="mock-block"></div>
+                        <div class="mock-block a"></div><div class="mock-block a"></div><div class="mock-block p"></div><div class="mock-block"></div><div class="mock-block c"></div>
+                        <div class="mock-block c"></div><div class="mock-block"></div><div class="mock-block a"></div><div class="mock-block p"></div><div class="mock-block"></div>
+                        <div class="mock-block"></div><div class="mock-block c"></div><div class="mock-block"></div><div class="mock-block a"></div><div class="mock-block p"></div>
+                        <div class="mock-block p"></div><div class="mock-block p"></div><div class="mock-block c"></div><div class="mock-block"></div><div class="mock-block a"></div>
+                    </div>
+                    <div style="text-align:center; color:#555; font-size:10px;">AD PLACEHOLDER</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Güçlü <span>Oyun Mekanikleri</span></h2>
+        <div class="features-grid">
+            <!-- Bomb -->
+            <div class="feature-card card-bomb">
+                <div class="feature-icon">💣</div>
+                <h3>Yıkıcı Bomba</h3>
+                <p>Ekrandaki tüm renkli blokları zincirleme reaksiyonla tek seferde yok et. Sıkışık durumlardan kurtulmanın en patlayıcı yolu!</p>
+            </div>
+            <!-- Rocket -->
+            <div class="feature-card card-rocket">
+                <div class="feature-icon">🚀</div>
+                <h3>Yatay/Dikey Roket</h3>
+                <p>Yüksek hızla ateşlenen roketler sayesinde dikey veya yatay bir hattı tamamen temizleyerek yeni rift kombinasyonları yarat.</p>
+            </div>
+            <!-- Lightning -->
+            <div class="feature-card card-lightning">
+                <div class="feature-icon">⚡</div>
+                <h3>Zincirleme Şimşek</h3>
+                <p>Elektrik arkları oluşturarak ekranın farklı köşelerindeki aynı renkli hedef blokları anında temizle ve alanı genişlet.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Gameplay Showcase -->
+    <section class="gameplay-interactive" id="interactive">
+        <h2 class="section-title">Efektleri <span>Test Et</span></h2>
+        <div class="interactive-board">
+            <p class="interactive-title">Aşağıdaki güçlendiricilere tıklayarak web simülasyon efektini tetikleyin:</p>
+            <div class="action-triggers">
+                <button class="trigger-btn" data-type="bomb">Bomba Patlat</button>
+                <button class="trigger-btn" data-type="rocket">Roket Fırlat</button>
+                <button class="trigger-btn" data-type="lightning">Şimşek Çaktır</button>
+            </div>
+            <div class="preview-display-zone" id="display-zone">
+                <span class="effect-animation" id="effect-text">Efekti görmek için bir butona basın.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="stats-section">
+        <div class="stat-box">
+            <h2>100+</h2>
+            <p>Eşsiz Seviye</p>
+        </div>
+        <div class="stat-box">
+            <h2>60 FPS</h2>
+            <p>Akıcı Performans</p>
+        </div>
+        <div class="stat-box">
+            <h2>%100</h2>
+            <p>Eğlence & Aksiyon</p>
+        </div>
+        <div class="stat-box">
+            <h2>0 TL</h2>
+            <p>Ücretsiz Oyna</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="logo">COLOR<span>RIFT</span></div>
+            <div class="footer-links">
+                <a href="privacy-policy.html" target="_blank">Gizlilik Politikası</a>
+                <a href="#">Destek</a>
+                <a href="#">İletişim</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2026 Color Rift. Tüm Hakları Saklıdır. Built for maximum engagement.
+        </div>
+    </footer>
+
+    <!-- Interactive JS Processing logic -->
+    <script>
+        const buttons = document.querySelectorAll('.trigger-btn');
+        const displayZone = document.getElementById('display-zone');
+        const effectText = document.getElementById('effect-text');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active status
+                buttons.forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                
+                const type = button.getAttribute('data-type');
+                
+                if(type === 'bomb') {
+                    displayZone.style.background = 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, #06060c 70%)';
+                    effectText.innerHTML = '<b style="color:var(--accent); font-size:24px; text-shadow:var(--glow-gold)">BOOM! Ekran Temizlendi! 💣</b>';
+                } else if(type === 'rocket') {
+                    displayZone.style.background = 'linear-gradient(90deg, transparent, rgba(255,0,122,0.4), transparent)';
+                    effectText.innerHTML = '<b style="color:var(--primary); font-size:24px; text-shadow:var(--glow-pink)">FIIUUVV! Satır Yok Edildi! 🚀</b>';
+                } else if(type === 'lightning') {
+                    displayZone.style.background = 'radial-gradient(circle, rgba(0,240,255,0.4) 0%, #06060c 80%)';
+                    effectText.innerHTML = '<b style="color:var(--secondary); font-size:24px; text-shadow:var(--glow-cyan)">ÇATIRRR! Şimşekler Çaktı! ⚡</b>';
+                }
+                
+                // Smooth reset
+                setTimeout(() => {
+                    displayZone.style.background = '#06060c';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
